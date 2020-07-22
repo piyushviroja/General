@@ -1,0 +1,83 @@
+
+ALTER proc [dbo].[Insert_Update_Members]
+@MyTabMb DynamicFormTableinMembers READONLY,
+@OUTVAL int output,
+@OUTMESSAGE varchar(100) output
+
+as
+set @OUTVAL=0
+begin
+	
+	truncate table Tbl_Members
+	INSERT INTO Tbl_Members(CompanyName,MemberID,MemberType,Address1,Address2,Address3,AreaName,CityName,Pincode,ContactPersion1,ContactPersion2,CategoryName,Office,Resident,Fax,Mobile1,Mobile2,EmailID,Website,entrydate)
+    SELECT CompanyName,MemberID,MemberType,Address1,Address2,Address3,AreaName,CityName,Pincode,ContactPersion1,ContactPersion2,CategoryName,Office,Resident,Fax,Mobile1,Mobile2,EmailID,Website,GETDATE() FROM @MyTabMb
+	SET @OUTVAL=1
+	SET @OUTMESSAGE='Members Record  Successfully Saved.!'
+
+	
+end
+return @OUTVAL
+
+
+++++++++++++++++++++++++++
+
+public  class DtClass
+    {
+        public DataTable DtForm { get; set; }
+    }
+    public  MEMBERS.SQLReturnValue SaveDynamicForm(DtClass ObjPdfQuestions)
+    {
+      MEMBERS.SQLReturnValue Mesg=  ExecuteProcedureWithDatatable("Insert_Update_Members", ObjPdfQuestions.DtForm,"MyTabMb");
+      return Mesg;
+    }
+
+++++++++++++++++++++++++++++++
+
+try
+        {
+
+            foreach (GridViewRow row in dg.Rows)
+            {
+                mb.CompanyName = row.Cells[0].Text.Replace(" ", "");
+                mb.MemberID = row.Cells[1].Text.Trim();
+                mb.MemberType = row.Cells[2].Text.Trim();
+                mb.Address1 = row.Cells[3].Text.Replace(" ", "");
+                mb.Address2 = row.Cells[4].Text.Replace(" ", "");
+                mb.Address3 = row.Cells[5].Text.Replace(" ", "");
+                mb.AreaName = row.Cells[6].Text.Replace(" ", "");
+                mb.CityName = row.Cells[7].Text.Replace(" ", "");
+                mb.Pincode = row.Cells[8].Text.Replace(" ", "");
+                mb.ContactPersion1 = row.Cells[9].Text.Replace(" ", "");
+                mb.ContactPersion2 = row.Cells[10].Text.Replace(" ", "");
+                mb.CategoryName = row.Cells[11].Text.Trim();
+                mb.Office = row.Cells[12].Text.Replace(" ", "");
+                mb.Resident = row.Cells[13].Text.Replace(" ", "");
+                mb.Fax = row.Cells[14].Text.Replace(" ", "");
+                mb.Mobile1 = row.Cells[15].Text.Replace(" ", "");
+                mb.Mobile2 = row.Cells[16].Text.Replace(" ", "");
+                mb.EmailID = row.Cells[17].Text.Replace(" ", "").Replace(",", " ");
+                mb.Website = row.Cells[18].Text.Replace(" ", "");
+
+                dtnew.Rows.Add(mb.CompanyName, mb.MemberID, mb.MemberType, mb.Address1, mb.Address2, mb.Address3, mb.AreaName, mb.CityName, mb.Pincode, mb.ContactPersion1,
+                mb.ContactPersion2, mb.CategoryName, mb.Office, mb.Resident, mb.Fax, mb.Mobile1, mb.Mobile2, mb.EmailID, mb.Website);
+
+
+            }
+
+        }
+        catch (Exception ex)
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "noti", "setMessage('" + ex.ToString() + "',2);", true);
+        }
+        MembersClass MbNew = new MembersClass();
+        MembersClass.DtClass Mdt = new MembersClass.DtClass();
+        Mdt.DtForm = dtnew;
+        Mesg = MbNew.SaveDynamicForm(Mdt);
+        if (Mesg.ValueFromSQL == 1)
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "noti", "setMessage('" + Mesg.MessageFromSQL + "',1);", true);
+        }
+        else
+        {
+            ScriptManager.RegisterStartupScript(this, this.GetType(), "noti", "setMessage('" + Mesg.MessageFromSQL + "',2);", true);
+        }
